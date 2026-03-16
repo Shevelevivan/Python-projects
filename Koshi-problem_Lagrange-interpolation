@@ -1,0 +1,387 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Подзадача 1
+
+# In[6]:
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+# In[3]:
+
+
+def divided_difference(x, y):
+    n = len(y)
+    coef = np.zeros((n, n))
+    coef[:, 0] = y
+
+    for j in range(1, n):
+        for i in range(n - j):
+            coef[i][j] = (coef[i + 1][j - 1] - coef[i][j - 1]) / (x[i + j] - x[i])
+    
+    return coef[0]
+
+
+# In[4]:
+
+
+def newton_interpolation(x, y):
+    n = len(x)
+    coef = divided_difference(x, y)
+
+    def polynomial(X):
+        result = 0
+        for i in range(n):
+            term = coef[i]
+            for j in range(i):
+                term *= (X - x[j])
+            result += term
+        return result
+
+    return polynomial
+
+
+# In[4]:
+
+
+#пример для значений соответствующих функции y = x^2
+x = [-2, -1, 0, 1, 2]
+y = [4, 1, 0, 1, 4]
+
+polynomial = newton_interpolation(x,y)
+x_value = 0.5 # для него результат должен быть (0.5)^2 = 0.25
+print(f"Значение полинома в x = {x_value}: {polynomial(x_value)}")
+
+
+# In[5]:
+
+
+import math as mth
+
+x1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y1 = []
+x_value = 9.5
+
+for i in range(len(x1)):
+    y1.append(mth.cos(x1[i]) * mth.sqrt(x1[i]))
+
+polynomial = newton_interpolation(x1,y1)
+
+print(f"Значение функции cos(x)sqrt(x) в x = {x_value}: {round(mth.cos(x_value) * mth.sqrt(x_value), 10)}")
+print(f"Значение полинома в x = {x_value}: {round(polynomial(x_value), 10)}")
+print(f"Погрешность в x = {x_value}: {round(mth.fabs(polynomial(x_value) - mth.cos(x_value) * mth.sqrt(x_value)), 10)}")
+
+
+# In[6]:
+
+
+def function(X):
+    Y = []
+    for i in range(len(X)):
+        Y.append(mth.cos(X[i]) * mth.sqrt(X[i]))
+    return Y
+        
+X = np.linspace(0, 10, 100)
+Y = function(X)
+Y1 = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.scatter(x1, y1, color='black', label='Узлы', zorder=3)
+plt.plot(X, Y, label='y = cos(x)sqrt(x)', color = "blue")
+plt.plot(X, Y1, label='Полином Ньютона', linestyle='--', color="red")
+plt.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Интерполяция Ньютона')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.grid()
+plt.show()
+
+
+# In[7]:
+
+
+x2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y2 = []
+x_value_1 = 2.5
+x_value_2 = 8.5
+
+for i in range(len(x2)):
+    y2.append(x2[i]* np.exp(mth.sin(2*x2[i])))
+
+polynomial = newton_interpolation(x2,y2)
+
+x1f = round(x_value_1* np.exp(mth.sin(2*x_value_1)), 10)
+x1p = round(polynomial(x_value_1), 10)
+x2f = round(x_value_2* np.exp(mth.sin(2*x_value_2)), 10)
+x2p = round(polynomial(x_value_2), 10)
+
+print(f"Значение функции x*exp(sin2x) в x = {x_value_1}: {x1f}")
+print(f"Значение полинома в x = {x_value_1}: {x1p}")
+print(f"Погрешность в x = {x_value_1}: {mth.fabs(x1f-x1p)}")
+
+print("")
+
+print(f"Значение функции x*exp(sin2x) в x = {x_value_2}: {x2f}")
+print(f"Значение полинома в x = {x_value_2}: {x2p}")
+print(f"Погрешность в x = {x_value_2}: {mth.fabs(x2f-x2p)}")
+
+
+# In[8]:
+
+
+def function(X):
+    Y = []
+    for i in range(len(X)):
+        Y.append(X[i]* np.exp(mth.sin(2*X[i])))
+    return Y
+        
+X = np.linspace(0, 10, 100)
+Y = function(X)
+Y1 = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.scatter(x2, y2, color='black', label='Узлы', zorder=3)
+plt.plot(X, Y, label='y = cos(x)sqrt(x)', color = "blue")
+plt.plot(X, Y1, label='Полином Ньютона', linestyle='--', color="red")
+plt.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Интерполяция Ньютона')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.grid()
+plt.show()
+
+
+# In[9]:
+
+
+xi = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+yi = [-1, -1, 0, -2, 1, 2, 2, 2, -1, 1, 0]
+
+points = [(xi[i], yi[i]) for i in range(len(xi))]
+    
+print("узлы интерполяции: ", points)
+print("")
+
+polynomial = newton_interpolation(xi, yi)
+
+print("коэффициенты полинома: ",divided_difference(xi,yi))
+print("")
+
+values = []
+for xk in xi:
+    values.append(round(polynomial(xk), 10))
+print("значения полинома: ",values)
+
+
+# In[10]:
+
+
+X = np.linspace(-5, 5, 100)
+Y = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.scatter(xi, yi, color='black', label='Узлы', zorder=3)
+plt.plot(X, Y, label='Полином Ньютона', color="red")
+plt.legend()
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Интерполяция Ньютона')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.grid()
+plt.show()
+
+
+# # Подзадача 2
+
+# In[8]:
+
+
+def bisection_method(func, a, b, tol=1e-6, max_iter=5000):
+    if func(a) * func(b) >= 0:
+        raise ValueError("f(a) and f(b) must have different signs")
+    elif round(func(a),6) == 0.0: return a
+    elif round(func(b),6) == 0.0: return b
+    
+    for _ in range(max_iter):
+        c = (a + b) / 2
+        if abs(func(c)) <= tol:
+            return c
+        elif func(a) * func(c) <= 0.0:
+            b = c
+        else:
+            a = c
+    return (a + b) / 2
+
+
+# In[12]:
+
+
+x1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y1 = []
+x_value = 9.5
+
+for i in range(len(x1)):
+    y1.append(mth.cos(x1[i]) * mth.sqrt(x1[i]))
+
+polynomial = newton_interpolation(x1,y1)
+
+zero_points1 = []
+for i in range(len(x1) - 1):
+    try:
+        zero = bisection_method(polynomial, x1[i], x1[i + 1])
+        zero_points1.append(zero)
+    except ValueError:
+        continue
+
+print("Нули полинома:", zero_points1)
+
+
+# In[13]:
+
+
+X = np.linspace(0, 10, 100)
+Y1 = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.plot(X, Y1, label='Полином Ньютона', color = 'xkcd:navy')
+plt.axhline(0, color='gray', lw=0.5)
+plt.scatter(zero_points1, polynomial(np.array(zero_points1)), color='red', zorder=5, label='Нули')
+plt.title('Полином Ньютона и его нули')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.legend()
+plt.grid()
+plt.show()
+
+
+# In[14]:
+
+
+x2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y2 = []
+x_value_1 = 2.5
+x_value_2 = 8.5
+
+for i in range(len(x2)):
+    y2.append(x2[i]* np.exp(mth.sin(2*x2[i])))
+
+polynomial = newton_interpolation(x2,y2)
+
+zero_points2 = []
+for i in range(len(x1) - 1):
+    try:
+        zero = bisection_method(polynomial, x2[i], x2[i + 1])
+        zero_points2.append(zero)
+    except ValueError:
+        continue
+
+print("Нули полинома:", zero_points2)
+
+
+# In[15]:
+
+
+X = np.linspace(0, 10, 100)
+Y2 = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.plot(X, Y2, label='Полином Ньютона', color = 'xkcd:navy')
+plt.axhline(0, color='gray', lw=0.5)
+plt.scatter(zero_points2, polynomial(np.array(zero_points2)), color='red', zorder=5, label='Нули')
+plt.title('Полином Ньютона и его нули')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.legend()
+plt.grid()
+plt.show()
+
+
+# In[16]:
+
+
+xi = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+yi = [-1, -1, 0, -2, 1, 2, 2, 2, -1, 1, 0]
+
+polynomial = newton_interpolation(xi, yi)
+
+zero_points = []
+for i in range(len(xi) - 1):
+    try:
+        zero = bisection_method(polynomial, xi[i], xi[i + 1])
+        zero_points.append(zero)
+    except ValueError:
+        continue
+
+print("Нули полинома:", zero_points)
+
+
+# In[17]:
+
+
+X = np.linspace(-5, 5, 1000)
+Y = polynomial(X)
+
+plt.figure(figsize=(10, 10))
+plt.plot(X, Y, label='Полином Ньютона', color = 'xkcd:navy')
+plt.axhline(0, color='gray', lw=0.5)
+plt.scatter(zero_points, polynomial(np.array(zero_points)), color='red', zorder=5, label='Нули')
+plt.title('Полином Ньютона и его нули')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.axhline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.axvline(0, color='black', linewidth=0.5, linestyle='--', alpha=0.7)
+plt.legend()
+plt.grid()
+plt.show()
+
+
+# # Подзадача 3
+
+# In[10]:
+
+
+def simpson (func, a, b, n):
+    h = (b - a) / n
+    
+    x = [a + i * h for i in range (1,n)]
+    #s1 - сумма элементов с четными индексами
+    #s2 - сумма элементов с нечетными индексами
+    s1 = sum(func(element) for element in x[1::2])
+    s2 = sum(func(element) for element in x[::2])
+    
+    return h/3 * (func(a) + 2 * s1 + 4 * s2 + func(b))
+
+
+# In[11]:
+
+
+xi = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+yi = [-1, -1, 0, -2, 1, 2, 2, 2, -1, 1, 0]
+
+polynomial = newton_interpolation(xi, yi)
+
+zero_points = []
+for i in range(len(xi) - 1):
+    try:
+        zero = bisection_method(polynomial, xi[i], xi[i + 1])
+        zero_points.append(zero)
+    except ValueError:
+        continue
+
+print("Подынтегральная площадь между нулями ",zero_points[0], " и ", zero_points[1], "составила: ", 
+      simpson(polynomial, zero_points[0], zero_points[1], n = 20))
+
+
+# In[ ]:
